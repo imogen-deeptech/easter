@@ -1,5 +1,5 @@
 [project]
-name = "courier"
+name = "easter"
 version = "0.0.1"
 description = "High-level communication between services using a RabbitMQ broker"
 requires-python = ">=3.9"
@@ -13,5 +13,5 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["courier*"]
+include = ["easter*"]
 exclude = ["tests*"]

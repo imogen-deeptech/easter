@@ -1,4 +1,4 @@
-from courier import Mailbox
+from easter import Mailbox
 from tests.user_created_message import UserCreatedMessage
 
 

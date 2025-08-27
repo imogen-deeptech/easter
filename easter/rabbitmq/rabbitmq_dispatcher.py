@@ -1,7 +1,7 @@
 from pika import BlockingConnection
-from courier.message import Message
-from courier.dispatcher import Dispatcher
-from courier.rabbitmq.rabbitmq_connection_factory import RabbitMQConnectionFactory
+from easter.message import Message
+from easter.dispatcher import Dispatcher
+from easter.rabbitmq.rabbitmq_connection_factory import RabbitMQConnectionFactory
 
 
 class RabbitMQDispatcher(Dispatcher):

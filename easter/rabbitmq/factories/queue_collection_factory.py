@@ -1,8 +1,8 @@
 import pika
 from typing import List
-from courier.mailbox import Mailbox
-from courier.rabbitmq.factories.queue_exchange_factory import QueueExchangeFactory
-from courier.rabbitmq.factories.queue_factory import QueueFactory
+from easter.mailbox import Mailbox
+from easter.rabbitmq.factories.queue_exchange_factory import QueueExchangeFactory
+from easter.rabbitmq.factories.queue_factory import QueueFactory
 
 
 class QueueCollectionFactory(object):

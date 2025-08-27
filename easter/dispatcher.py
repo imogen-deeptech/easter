@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from courier.message import Message
+from easter.message import Message
 
 
 class Dispatcher(ABC):

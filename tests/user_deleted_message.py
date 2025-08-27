@@ -1,4 +1,4 @@
-from courier import Message
+from easter import Message
 
 
 class UserDeletedMessage(Message):

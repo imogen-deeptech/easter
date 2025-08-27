@@ -1,5 +1,5 @@
 import pika
-from courier.mailbox import Mailbox
+from easter.mailbox import Mailbox
 
 
 class QueueExchangeFactory(object):

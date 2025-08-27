@@ -1,10 +1,10 @@
 import threading
 from typing import List
-from courier.mailbox import Mailbox
-from courier.message import Message
-from courier.consumer import Consumer
-from courier.rabbitmq.factories.queue_collection_factory import QueueCollectionFactory
-from courier.rabbitmq.rabbitmq_connection_factory import RabbitMQConnectionFactory
+from easter.mailbox import Mailbox
+from easter.message import Message
+from easter.consumer import Consumer
+from easter.rabbitmq.factories.queue_collection_factory import QueueCollectionFactory
+from easter.rabbitmq.rabbitmq_connection_factory import RabbitMQConnectionFactory
 
 
 class RabbitMQConsumer(Consumer):

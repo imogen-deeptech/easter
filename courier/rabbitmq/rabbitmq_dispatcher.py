@@ -1,3 +1,4 @@
+from pika import BlockingConnection
 from courier.message import Message
 from courier.dispatcher import Dispatcher
 from courier.rabbitmq.rabbitmq_connection_factory import RabbitMQConnectionFactory
@@ -9,11 +10,28 @@ class RabbitMQDispatcher(Dispatcher):
 
     def dispatch(self, message: Message):
         with self.connection_factory.build() as connection:
-            channel = connection.channel()
+            if self.is_exchange_declared(connection, message.message_type):
+                self.publish_message(connection, message)
 
-            serialized_message = message.serialize()
-            channel.basic_publish(
-                routing_key="#",
-                exchange=message.message_type,
-                body=serialized_message.encode("utf-8"),
-            )
+    def publish_message(self, connection: BlockingConnection, message: Message):
+        channel = connection.channel()
+        serialized_message = message.serialize()
+
+        channel.basic_publish(
+            routing_key="#",
+            exchange=message.message_type,
+            body=serialized_message.encode("utf-8"),
+        )
+
+        channel.close()
+
+    def is_exchange_declared(self, connection: BlockingConnection, exchange: str):
+        channel = connection.channel()
+
+        try:
+            channel.exchange_declare(exchange=exchange, passive=True)
+            channel.close()
+
+            return True
+        except Exception:
+            return False

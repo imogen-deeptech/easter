@@ -1,7 +1,8 @@
+import threading
 from typing import List
 from courier.mailbox import Mailbox
+from courier.message import Message
 from courier.consumer import Consumer
-from courier.delivery import Delivery
 from courier.rabbitmq.factories.queue_collection_factory import QueueCollectionFactory
 from courier.rabbitmq.rabbitmq_connection_factory import RabbitMQConnectionFactory
 
@@ -12,28 +13,48 @@ class RabbitMQConsumer(Consumer):
     ):
         self.connection_factory = connection_factory
         self.mailboxes = mailboxes
+        self.consumer_thread = None
+        self.connection = None
+        self.channel = None
 
     def consume(self):
-        queue_collection_factory = QueueCollectionFactory()
-        connection = self.connection_factory.build()
-        channel = connection.channel()
+        queue_factory = QueueCollectionFactory()
+        self.connection = self.connection_factory.build()
+        self.channel = self.connection.channel()
 
-        for queue_name, mailbox in queue_collection_factory.build(
-            channel, self.mailboxes
-        ):
+        for queue, mailbox in queue_factory.build(self.channel, self.mailboxes):
             message_handler = self.get_message_handler(mailbox)
-            channel.basic_consume(queue=queue_name, on_message_callback=message_handler)
-        channel.start_consuming()
+            self.channel.basic_consume(queue=queue, on_message_callback=message_handler)
+
+        self.consumer_thread = threading.Thread(target=self.start_consuming)
+        self.consumer_thread.start()
 
     def close(self):
-        pass
+        if self.channel and self.channel.is_open:
+            self.channel.stop_consuming()
+            self.channel.close()
+
+        if self.connection and self.connection.is_open:
+            self.connection.close()
+
+        if self.consumer_thread and self.consumer_thread.is_alive():
+            self.consumer_thread.join()
+
+    def start_consuming(self):
+        try:
+            if self.channel is not None:
+                self.channel.start_consuming()
+        except:
+            pass
 
     def get_message_handler(self, mailbox):
-        def message_handler(ch, method, properties, body):
-            message = body.decode("utf-8")
-            delivery = Delivery.from_serialized_message(message)
+        def message_handler(channel, method, properties, body):
+            serialized_message = body.decode("utf-8")
+            message = Message.deserialize(serialized_message)
 
-            if delivery.message_type in mailbox.supported_message_types:
-                mailbox.handle(delivery)
+            if type(message) in mailbox.supported_message_types:
+                mailbox.handle(message)
+
+            channel.basic_ack(delivery_tag=method.delivery_tag)
 
         return message_handler

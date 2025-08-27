@@ -15,7 +15,7 @@ class QueueCollectionFactory(object):
             queue_name = queue_factory.build(channel, mailbox)
 
             for message_type in mailbox.supported_message_types:
-                exchange_factory.build(channel, queue_name, message_type)
+                exchange_factory.build(channel, queue_name, message_type.__name__)
 
             queues.append((queue_name, mailbox))
 

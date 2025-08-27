@@ -1,8 +1,11 @@
-import threading
-from courier import RabbitMQConnectionFactory, RabbitMQDispatcher, RabbitMQConsumer
+from courier import RabbitMQConnectionFactory
+from courier import RabbitMQDispatcher
+from courier import RabbitMQConsumer
+
 from tests.user import User
 from tests.user_created_mailbox import UserCreatedMailbox
 from tests.user_created_message import UserCreatedMessage
+from tests.user_deleted_message import UserDeletedMessage
 
 connection_factory = (
     RabbitMQConnectionFactory()
@@ -11,31 +14,23 @@ connection_factory = (
     .with_credentials("rabbit", "32132111")
 )
 
-user_created_mailbox = UserCreatedMailbox()
-dispatcher = RabbitMQDispatcher(connection_factory)
-consumer = RabbitMQConsumer(connection_factory, [user_created_mailbox])
-
 
 def test_rabbitmq():
-    consumer_thread = threading.Thread(target=consumer.consume)
-    consumer_thread.start()
-
     user = User("test_user", "test@example.com")
-    message = UserCreatedMessage(user)
-    dispatcher.dispatch(message)
+    user_created_message = UserCreatedMessage(user)
+    user_deleted_message = UserDeletedMessage(user)
+    user_created_mailbox = UserCreatedMailbox()
 
-    consumer_thread.join(1)
-    consumer.close()
+    dispatcher = RabbitMQDispatcher(connection_factory)
 
-    assert (
-        user_created_mailbox.last_delivery.message_type
-        in user_created_mailbox.supported_message_types
-    )
+    with RabbitMQConsumer(connection_factory, [user_created_mailbox]) as consumer:
+        dispatcher.dispatch(user_created_message)
+        dispatcher.dispatch(user_deleted_message)
 
-    assert (
-        user_created_mailbox.last_delivery.message_content["user"]["name"] == user.name
-    )
-    assert (
-        user_created_mailbox.last_delivery.message_content["user"]["email"]
-        == user.email
-    )
+    message = user_created_mailbox.last_message
+
+    assert message.user.name == user.name
+    assert message.user.email == user.email
+    assert user_created_mailbox.received_messages == 1
+    assert type(message) in user_created_mailbox.supported_message_types
+    assert type(message) is UserCreatedMessage

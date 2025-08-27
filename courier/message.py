@@ -1,19 +1,15 @@
-import json
+import jsonpickle
 from abc import ABC
 
 
 class Message(ABC):
     def serialize(self):
-        message_content = self.get_content()
-        message_as_serialized_json = json.dumps(
-            {"type": self.message_type, "content": message_content}
-        )
+        return jsonpickle.encode(self)
 
-        return message_as_serialized_json
-
-    def get_content(self) -> dict:
-        return {}
+    @staticmethod
+    def deserialize(serialized_message: str):
+        return jsonpickle.decode(serialized_message)
 
     @property
-    def message_type(self) -> str:
+    def message_type(self):
         return self.__class__.__name__

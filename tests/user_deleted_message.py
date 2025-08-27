@@ -1,6 +1,6 @@
 from courier import Message
 
 
-class UserCreatedMessage(Message):
+class UserDeletedMessage(Message):
     def __init__(self, user):
         self.user = user

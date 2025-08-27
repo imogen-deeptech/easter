@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from courier.delivery import Delivery
+from courier.message import Message
 
 
 class Mailbox(ABC):
     supported_message_types = []
 
     @abstractmethod
-    def handle(self, delivery: Delivery):
+    def handle(self, message: Message):
         pass

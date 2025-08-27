@@ -1,9 +1,12 @@
 from courier import Mailbox
+from tests.user_created_message import UserCreatedMessage
 
 
 class UserCreatedMailbox(Mailbox):
-    last_delivery = None
-    supported_message_types = ["UserCreatedMessage"]
+    last_message = None
+    received_messages = 0
+    supported_message_types = [UserCreatedMessage]
 
-    def handle(self, delivery):
-        self.last_delivery = delivery
+    def handle(self, message):
+        self.last_message = message
+        self.received_messages += 1

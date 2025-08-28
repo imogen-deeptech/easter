@@ -49,13 +49,16 @@ class RabbitMQConsumer(Consumer):
 
     def get_message_handler(self, mailbox):
         def message_handler(channel, method, properties, body):
-            serialized_message = body.decode("utf-8")
-            message = Message.deserialize(serialized_message)
+            try:
+                serialized_message = body.decode("utf-8")
+                message = Message.deserialize(serialized_message)
 
-            if message is not None and type(message) in mailbox.supported_message_types:
-                mailbox.handle(message)
+                if type(message) in mailbox.supported_message_types:
+                    mailbox.handle(message)
+
                 channel.basic_ack(delivery_tag=method.delivery_tag)
-            else:
+            except Exception as exception:
+                print("Error processing message:", exception)
                 channel.basic_nack(delivery_tag=method.delivery_tag)
 
         return message_handler

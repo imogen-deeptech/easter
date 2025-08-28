@@ -8,7 +8,10 @@ class Message(ABC):
 
     @staticmethod
     def deserialize(serialized_message: str):
-        return jsonpickle.decode(serialized_message)
+        try:
+            return jsonpickle.decode(serialized_message, on_missing="error")
+        except:
+            return None
 
     @property
     def message_type(self):

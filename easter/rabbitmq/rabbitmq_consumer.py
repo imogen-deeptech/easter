@@ -52,9 +52,10 @@ class RabbitMQConsumer(Consumer):
             serialized_message = body.decode("utf-8")
             message = Message.deserialize(serialized_message)
 
-            if type(message) in mailbox.supported_message_types:
+            if message is not None and type(message) in mailbox.supported_message_types:
                 mailbox.handle(message)
-
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+                channel.basic_ack(delivery_tag=method.delivery_tag)
+            else:
+                channel.basic_nack(delivery_tag=method.delivery_tag)
 
         return message_handler

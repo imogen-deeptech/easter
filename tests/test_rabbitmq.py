@@ -1,6 +1,6 @@
-from easter import RabbitMQConnectionFactory
-from easter import RabbitMQDispatcher
-from easter import RabbitMQConsumer
+from easter.rabbitmq import RabbitMQConnectionFactory
+from easter.rabbitmq import RabbitMQDispatcher
+from easter.rabbitmq import RabbitMQConsumer
 
 from tests.user import User
 from tests.user_created_mailbox import UserCreatedMailbox

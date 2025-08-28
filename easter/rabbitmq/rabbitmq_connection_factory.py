@@ -2,12 +2,19 @@ import pika
 
 
 class RabbitMQConnectionFactory:
-    def __init__(self):
-        self.host = "localhost"
-        self.port = 5672
-        self.username = "guest"
-        self.password = "guest"
-        self.virtual_host = "/"
+    def __init__(
+        self,
+        host="localhost",
+        port=5672,
+        username="guest",
+        password="guest",
+        virtual_host="/",
+    ):
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.virtual_host = virtual_host
 
     def with_host(self, host):
         self.host = host

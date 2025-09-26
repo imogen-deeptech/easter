@@ -30,15 +30,18 @@ class RabbitMQConsumer(Consumer):
         self.consumer_thread.start()
 
     def close(self):
-        if self.channel and self.channel.is_open:
-            self.channel.stop_consuming()
-            self.channel.close()
+        try:
+            if self.channel and self.channel.is_open:
+                self.channel.stop_consuming()
+                self.channel.close()
 
-        if self.connection and self.connection.is_open:
-            self.connection.close()
+            if self.connection and self.connection.is_open:
+                self.connection.close()
 
-        if self.consumer_thread and self.consumer_thread.is_alive():
-            self.consumer_thread.join()
+            if self.consumer_thread and self.consumer_thread.is_alive():
+                self.consumer_thread.join()
+        except:
+            pass
 
     def start_consuming(self):
         try:

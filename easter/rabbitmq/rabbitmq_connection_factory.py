@@ -9,12 +9,16 @@ class RabbitMQConnectionFactory:
         username="guest",
         password="guest",
         virtual_host="/",
+        heartbeat=60,
+        blocked_connection_timeout=300,
     ):
         self.host = host
         self.port = port
         self.username = username
         self.password = password
         self.virtual_host = virtual_host
+        self.heartbeat = heartbeat
+        self.blocked_connection_timeout = blocked_connection_timeout
 
     def with_host(self, host):
         self.host = host
@@ -33,6 +37,14 @@ class RabbitMQConnectionFactory:
         self.virtual_host = virtual_host
         return self
 
+    def with_heartbeat(self, heartbeat):
+        self.heartbeat = heartbeat
+        return self
+
+    def with_blocked_connection_timeout(self, blocked_connection_timeout):
+        self.blocked_connection_timeout = blocked_connection_timeout
+        return self
+
     def build(self):
         return pika.BlockingConnection(
             pika.ConnectionParameters(
@@ -42,5 +54,7 @@ class RabbitMQConnectionFactory:
                 credentials=pika.PlainCredentials(
                     username=self.username, password=self.password
                 ),
+                heartbeat=self.heartbeat,
+                blocked_connection_timeout=self.blocked_connection_timeout,
             )
         )

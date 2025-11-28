@@ -9,8 +9,8 @@ class RabbitMQConnectionFactory:
         username="guest",
         password="guest",
         virtual_host="/",
-        heartbeat=60,  # seconds
-        blocked_connection_timeout=300,  # seconds
+        heartbeat=60,
+        blocked_connection_timeout=300,
     ):
         self.host = host
         self.port = port

@@ -1,7 +1,6 @@
 import threading
 import time
 from typing import List
-from pika.exceptions import AMQPConnectionError, AMQPChannelError
 from easter.mailbox import Mailbox
 from easter.message import Message
 from easter.consumer import Consumer
@@ -60,14 +59,8 @@ class RabbitMQConsumer(Consumer):
         reconnect_attempts = 0
         while not self._should_stop:
             try:
-                if self.channel is not None:
+                if self.channel is not None and self.channel.is_open:
                     self.channel.start_consuming()
-            except (AMQPConnectionError, AMQPChannelError):
-                if self._should_stop:
-                    break
-                reconnect_attempts = self._try_reconnect(reconnect_attempts)
-                if reconnect_attempts < 0:
-                    break
             except Exception:
                 if self._should_stop:
                     break

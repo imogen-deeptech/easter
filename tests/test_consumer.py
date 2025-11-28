@@ -1,7 +1,6 @@
 from unittest.mock import Mock, patch, MagicMock
 import threading
 import time
-from pika.exceptions import AMQPConnectionError
 
 from easter.rabbitmq import RabbitMQConnectionFactory, RabbitMQConsumer
 from easter import Mailbox
@@ -93,7 +92,7 @@ def test_try_reconnect_returns_negative_when_max_attempts_reached(mock_queue_fac
 @patch("easter.rabbitmq.rabbitmq_consumer.QueueCollectionFactory")
 def test_try_reconnect_increments_attempts_on_failure(mock_queue_factory):
     factory = MagicMock()
-    factory.build.side_effect = AMQPConnectionError("Connection refused")
+    factory.build.side_effect = Exception("Connection refused")
 
     consumer = RabbitMQConsumer(factory, [], max_reconnect_attempts=5, reconnect_delay=0.01)
     consumer.connection = None
